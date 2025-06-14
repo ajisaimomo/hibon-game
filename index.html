@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヒボンゲーム - 非凡な人間である区別実践</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a56 0%, #ffdb4d 50%, #ff6b35 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #d63031;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .week-info {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .current-week {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d63031;
+            margin-bottom: 10px;
+        }
+
+        .week-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .week-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff9a56 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .week-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .week-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #ff6b35;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #d63031;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            color: #d63031;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .distinctions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .distinction-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .distinction-card:hover {
+            border-color: #ff6b35;
+            background: #fff3e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+        }
+
+        .distinction-card.selected {
+            border-color: #00b894;
+            background: rgba(0, 184, 148, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.2);
+        }
+
+        .distinction-checkbox {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .distinction-card.selected .distinction-checkbox {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+        }
+
+        .distinction-name {
+            font-weight: bold;
+            color: #d63031;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            padding-right: 40px;
+        }
+
+        .distinction-practice {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .selected-distinctions {
+            margin-top: 30px;
+        }
+
+        .selected-title {
+            color: #d63031;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bingo-section {
+            margin: 30px 0;
+        }
+
+        .bingo-title {
+            color: #d63031;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bingo-grid {
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .bingo-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stage-header {
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            padding: 15px 10px;
+            font-size: 1.1em;
+        }
+
+        .stage-focus {
+            background: #90EE90;
+        }
+
+        .stage-momentum {
+            background: #FFA500;
+        }
+
+        .stage-breakthrough {
+            background: #FFD700;
+        }
+
+        .distinction-row {
+            border-bottom: 1px solid #eee;
+        }
+
+        .distinction-label {
+            padding: 15px;
+            font-weight: bold;
+            color: #d63031;
+            background: #f8f9fa;
+            border-right: 2px solid #ddd;
+            min-width: 150px;
+            font-size: 0.9em;
+        }
+
+        .bingo-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: white;
+        }
+
+        .bingo-cell.stage-focus {
+            background: rgba(144, 238, 144, 0.3);
+        }
+
+        .bingo-cell.stage-momentum {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .bingo-cell.stage-breakthrough {
+            background: rgba(255, 215, 0, 0.3);
+        }
+
+        .bingo-cell:hover {
+            border-color: #ff6b35;
+            transform: scale(1.05);
+        }
+
+        .bingo-cell.completed {
+            background: #00b894 !important;
+            border-color: #00b894;
+        }
+
+        .bingo-cell.completed::after {
+            content: '●';
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .level-arrow {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .level-arrow::after {
+            content: ' →';
+            font-size: 1.5em;
+            margin-left: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #999;
+        }
+
+        .controls {
+            text-align: center;
+        }
+
+        .controls-title {
+            color: #d63031;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(116, 185, 255, 0.4);
+        }
+
+        .control-btn.success {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .distinctions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bingo-table {
+                min-width: 600px;
+            }
+
+            .bingo-cell {
+                width: 40px;
+                height: 40px;
+            }
+
+            .distinction-label {
+                font-size: 0.8em;
+                min-width: 120px;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 ヒボンゲーム</h1>
+            <div class="subtitle">非凡な人間であるという区別を実践する</div>
+        </div>
+
+        <div class="week-info">
+            <div class="current-week" id="currentWeek">2025年6月8日〜6月14日</div>
+            <div class="week-nav">
+                <button class="week-btn" id="prevWeek">◀ 前の週</button>
+                <button class="week-btn" id="nextWeek">次の週 ▶</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">今週の実践マス数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stageCount">0</div>
+                <div class="stat-label">到達段階数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="selectedCount">0</div>
+                <div class="stat-label">選択中の区別</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📝 今週実践する区別を選択</h2>
+            <p class="section-subtitle">7つの区別から今週実践したいものを選んでください</p>
+            
+            <div class="distinctions-grid" id="distinctionsGrid">
+                <!-- JavaScriptで生成 -->
+            </div>
+
+            <div class="bingo-section" id="bingoSection">
+                <!-- ビンゴグリッドがここに表示 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="controls">
+                <h3 class="controls-title">📊 管理機能</h3>
+                <div class="control-buttons">
+                    <button class="control-btn success" onclick="completeWeek()">✅ 今週完了</button>
+                    <button class="control-btn" onclick="showHistory()">📚 履歴表示</button>
+                    <button class="control-btn" onclick="exportData()">💾 バックアップ</button>
+                    <button class="control-btn" onclick="importData()">📁 復元</button>
+                    <button class="control-btn danger" onclick="resetWeek()">🔄 今週リセット</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 履歴モーダル -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📚 実践履歴</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="historyContent">
+                <!-- 履歴内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 区別データ
+        const DISTINCTIONS = [
+            {
+                id: 'integrity',
+                name: 'INTEGRITY',
+                practice: '自分の言葉を尊ぶ。つまり、やると言ったことをやる。言った時間までにやる。やらないときはそれを清掃する。新しい約束をし、それを守る。'
+            },
+            {
+                id: 'freedom',
+                name: 'ペテンから自由である',
+                practice: '「わたしが正しい」を手放す。'
+            },
+            {
+                id: 'powerful',
+                name: 'パワフルである',
+                practice: 'コミュニケーションにおいてストレートであり、得たものを取る。'
+            },
+            {
+                id: 'brave',
+                name: '勇敢である',
+                practice: '恐れを承認し、そして行動する。'
+            },
+            {
+                id: 'peaceful',
+                name: '平和で穏やかである',
+                practice: '「ここには何か悪いことがある」という自分の解釈を手放す。'
+            },
+            {
+                id: 'charisma',
+                name: 'カリスマがある',
+                practice: '「〜するために」とかどこかに行き着こうとすることを手放す。'
+            },
+            {
+                id: 'enrolling',
+                name: 'エンローリングである',
+                practice: '自分の新しい可能性を、他の人がその可能性に心を触れられ感動しインスパイアするように分かち合う。'
+            }
+        ];
+
+        // ゲーム設定
+        const GAME_START = new Date('2025-06-08');
+        const GAME_END = new Date('2025-09-10');
+
+        // 現在の状態
+        let currentWeekStart = getWeekStart(new Date('2025-06-08'));
+        let gameData = loadData();
+
+        // 週の開始日を取得（日曜日開始）
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day;
+            return new Date(d.setDate(diff));
+        }
+
+        // データの読み込み（localStorage対応）
+        function loadData() {
+            try {
+                // まずlocalStorageから読み込みを試行
+                const savedData = localStorage.getItem('hibonGameData');
+                if (savedData) {
+                    const parsed = JSON.parse(savedData);
+                    console.log('Data loaded from localStorage');
+                    return parsed;
+                }
+                
+                // localStorageにデータがない場合は初期データ
+                console.log('No saved data found, creating new data');
+                return {
+                    weeks: {},
+                    history: []
+                };
+            } catch (e) {
+                console.warn('localStorage not available, using memory storage:', e);
+                
+                // localStorageが使えない場合はメモリ内保存にフォールバック
+                if (!window.hibonGameData) {
+                    window.hibonGameData = {
+                        weeks: {},
+                        history: []
+                    };
+                }
+                return window.hibonGameData;
+            }
+        }
+
+        // データの保存（localStorage対応）
+        function saveData() {
+            try {
+                // localStorageに保存を試行
+                localStorage.setItem('hibonGameData', JSON.stringify(gameData));
+                console.log('Data saved to localStorage');
+            } catch (e) {
+                console.warn('localStorage save failed, using memory storage:', e);
+                
+                // localStorageが使えない場合はメモリ内保存
+                window.hibonGameData = gameData;
+                console.log('Data saved to memory');
+            }
+        }
+
+        // データのバックアップ機能
+        function backupData() {
+            try {
+                const dataStr = JSON.stringify(gameData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `hibon_backup_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                alert('データをバックアップしました！');
+            } catch (e) {
+                console.error('Backup failed:', e);
+                alert('バックアップに失敗しました。');
+            }
+        }
+
+        // データの復元機能
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // データの妥当性チェック
+                        if (importedData.weeks && importedData.history) {
+                            if (confirm('データを復元しますか？現在のデータは上書きされます。')) {
+                                gameData = importedData;
+                                saveData();
+                                
+                                // 画面を更新
+                                renderDistinctions();
+                                renderBingoGrid();
+                                updateStats();
+                                
+                                alert('データを復元しました！');
+                            }
+                        } else {
+                            alert('無効なファイル形式です。');
+                        }
+                    } catch (e) {
+                        console.error('Restore failed:', e);
+                        alert('ファイルの読み込みに失敗しました。');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // 週データの取得
+        function getWeekData() {
+            const weekKey = currentWeekStart.toISOString().split('T')[0];
+            if (!gameData.weeks[weekKey]) {
+                gameData.weeks[weekKey] = {
+                    selected: [],
+                    progress: {}
+                };
+            }
+            return gameData.weeks[weekKey];
+        }
+
+        // 区別選択の描画
+        function renderDistinctions() {
+            const grid = document.getElementById('distinctionsGrid');
+            const weekData = getWeekData();
+            
+            grid.innerHTML = '';
+            
+            DISTINCTIONS.forEach(distinction => {
+                const isSelected = weekData.selected.includes(distinction.id);
+                
+                const card = document.createElement('div');
+                card.className = `distinction-card ${isSelected ? 'selected' : ''}`;
+                card.onclick = () => toggleDistinction(distinction.id);
+                
+                card.innerHTML = `
+                    <div class="distinction-checkbox">${isSelected ? '✓' : ''}</div>
+                    <div class="distinction-name">${distinction.name}</div>
+                    <div class="distinction-practice">${distinction.practice}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // ビンゴグリッドの描画
+        function renderBingoGrid() {
+            const section = document.getElementById('bingoSection');
+            const weekData = getWeekData();
+            
+            if (weekData.selected.length === 0) {
+                section.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📝 区別を選択してください</h3>
+                        <p>上記から実践したい区別を選んで、ビンゴを始めましょう</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            section.innerHTML = `
+                <div class="bingo-title">🎯 非凡装着ビンゴゲーム！</div>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                    あなたが非凡であるとき、人生は新たなレベルの興奮と可能性をまとい始めている！！
+                </p>
+                <div class="bingo-grid">
+                    <table class="bingo-table">
+                        <thead>
+                            <tr>
+                                <th style="background: #f8f9fa; border: 1px solid #ddd;"></th>
+                                <th colspan="3" class="stage-header stage-focus">集中期</th>
+                                <th colspan="3" class="stage-header stage-momentum">はずみ期</th>
+                                <th colspan="4" class="stage-header stage-breakthrough">ブレイクスルーZONE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bingoTableBody">
+                            <!-- JavaScriptで生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="level-arrow">軽さ・自由さレベル</div>
+            `;
+            
+            const tbody = document.getElementById('bingoTableBody');
+            
+            weekData.selected.forEach(distId => {
+                const distinction = DISTINCTIONS.find(d => d.id === distId);
+                if (!distinction) return;
+                
+                if (!weekData.progress[distId]) {
+                    weekData.progress[distId] = new Array(10).fill(false);
+                }
+                
+                const row = document.createElement('tr');
+                row.className = 'distinction-row';
+                
+                let html = `<td class="distinction-label">${distinction.name}</td>`;
+                
+                for (let i = 0; i < 10; i++) {
+                    let stageClass = '';
+                    if (i < 3) stageClass = 'stage-focus';
+                    else if (i < 6) stageClass = 'stage-momentum';
+                    else stageClass = 'stage-breakthrough';
+                    
+                    const isCompleted = weekData.progress[distId][i];
+                    const canClick = canToggleCell(distId, i);
+                    
+                    html += `
+                        <td class="bingo-cell ${stageClass} ${isCompleted ? 'completed' : ''}" 
+                            onclick="${canClick ? `toggleCell('${distId}', ${i})` : ''}"
+                            style="${!canClick ? 'cursor: not-allowed; opacity: 0.5;' : ''}">
+                        </td>
+                    `;
+                }
+                
+                row.innerHTML = html;
+                tbody.appendChild(row);
+            });
+        }
+
+        // セルをクリック可能かチェック
+        function canToggleCell(distId, index) {
+            const weekData = getWeekData();
+            const progress = weekData.progress[distId];
+            
+            // 最後に完了したセルまでクリック可能
+            const lastCompletedIndex = progress.lastIndexOf(true);
+            
+            if (lastCompletedIndex === -1) {
+                // まだ何も完了していない場合、最初のセルのみクリック可能
+                return index === 0;
+            } else {
+                // 最後に完了したセルと、その次のセルをクリック可能
+                return index <= lastCompletedIndex + 1;
+            }
+        }
+
+        // セルの切り替え
+        function toggleCell(distId, index) {
+            const weekData = getWeekData();
+            const progress = weekData.progress[distId];
+            
+            if (!canToggleCell(distId, index)) return;
+            
+            const isCompleted = progress[index];
+            
+            if (!isCompleted) {
+                // 完了にする（左から順番に）
+                progress[index] = true;
+            } else {
+                // 解除する（右端から順番に）
+                const lastCompletedIndex = progress.lastIndexOf(true);
+                if (index === lastCompletedIndex) {
+                    progress[index] = false;
+                }
+            }
+            
+            saveData();
+            renderBingoGrid();
+            updateStats();
+        }
+
+        // 区別の選択切り替え
+        function toggleDistinction(distId) {
+            const weekData = getWeekData();
+            const index = weekData.selected.indexOf(distId);
+            
+            if (index === -1) {
+                weekData.selected.push(distId);
+                // 新しい区別の進捗配列を初期化
+                weekData.progress[distId] = new Array(10).fill(false);
+            } else {
+                weekData.selected.splice(index, 1);
+                delete weekData.progress[distId];
+            }
+            
+            saveData();
+            renderDistinctions();
+            renderBingoGrid();
+            updateStats();
+        }
+
+        // 統計更新
+        function updateStats() {
+            const weekData = getWeekData();
+            let totalCount = 0;
+            let stageCount = 0;
+            
+            weekData.selected.forEach(distId => {
+                if (weekData.progress[distId]) {
+                    const completed = weekData.progress[distId].filter(Boolean).length;
+                    totalCount += completed;
+                    
+                    // 段階到達数の計算
+                    if (completed >= 10) stageCount += 3; // ブレイクスルー到達
+                    else if (completed >= 6) stageCount += 2; // はずみ期到達
+                    else if (completed >= 3) stageCount += 1; // 集中期到達
+                }
+            });
+            
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('stageCount').textContent = stageCount;
+            document.getElementById('selectedCount').textContent = weekData.selected.length;
+        }
+
+        // 週表示更新
+        function updateWeekDisplay() {
+            const weekEnd = new Date(currentWeekStart);
+            weekEnd.setDate(currentWeekStart.getDate() + 6);
+            
+            const startStr = `${currentWeekStart.getFullYear()}年${currentWeekStart.getMonth() + 1}月${currentWeekStart.getDate()}日`;
+            const endStr = `${weekEnd.getMonth() + 1}月${weekEnd.getDate()}日`;
+            
+            document.getElementById('currentWeek').textContent = `${startStr}〜${endStr}`;
+            
+            // ボタンの状態
+            const prevWeek = new Date(currentWeekStart);
+            prevWeek.setDate(currentWeekStart.getDate() - 7);
+            document.getElementById('prevWeek').disabled = prevWeek < GAME_START;
+            
+            const nextWeek = new Date(currentWeekStart);
+            nextWeek.setDate(currentWeekStart.getDate() + 7);
+            document.getElementById('nextWeek').disabled = nextWeek > GAME_END;
+        }
+
+        // 週移動
+        function changeWeek(direction) {
+            const newWeek = new Date(currentWeekStart);
+            newWeek.setDate(currentWeekStart.getDate() + (direction * 7));
+            
+            if (newWeek >= GAME_START && newWeek <= GAME_END) {
+                currentWeekStart = newWeek;
+                renderDistinctions();
+                renderBingoGrid();
+                updateWeekDisplay();
+                updateStats();
+            }
+        }
+
+        // 今週完了
+        function completeWeek() {
+            if (confirm('今週を完了して履歴に移動しますか？')) {
+                const weekData = getWeekData();
+                const weekKey = currentWeekStart.toISOString().split('T')[0];
+                
+                gameData.history.push({
+                    week: weekKey,
+                    data: JSON.parse(JSON.stringify(weekData)),
+                    completed: new Date().toISOString()
+                });
+                
+                delete gameData.weeks[weekKey];
+                saveData();
+                
+                renderDistinctions();
+                renderBingoGrid();
+                updateStats();
+                
+                alert('今週の記録を履歴に保存しました！');
+            }
+        }
+
+        // 履歴表示
+        function showHistory() {
+            const content = document.getElementById('historyContent');
+            
+            if (gameData.history.length === 0) {
+                content.innerHTML = '<p>まだ完了した週がありません。</p>';
+            } else {
+                let html = '';
+                gameData.history.forEach(entry => {
+                    const date = new Date(entry.week);
+                    let totalCount = 0;
+                    let stageCount = 0;
+                    
+                    entry.data.selected.forEach(distId => {
+                        if (entry.data.progress[distId]) {
+                            const completed = entry.data.progress[distId].filter(Boolean).length;
+                            totalCount += completed;
+                            
+                            if (completed >= 10) stageCount += 3;
+                            else if (completed >= 6) stageCount += 2;
+                            else if (completed >= 3) stageCount += 1;
+                        }
+                    });
+                    
+                    html += `
+                        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+                            <h4>${date.getMonth() + 1}月${date.getDate()}日の週</h4>
+                            <p>実践マス数: ${totalCount}個</p>
+                            <p>到達段階数: ${stageCount}段階</p>
+                            <p>選択した区別: ${entry.data.selected.length}個</p>
+                        </div>
+                    `;
+                });
+                content.innerHTML = html;
+            }
+            
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        // データエクスポート（バックアップ機能に変更）
+        function exportData() {
+            backupData();
+        }
+
+        // データインポート機能を追加
+        function importData() {
+            restoreData();
+        }
+
+        // 今週リセット
+        function resetWeek() {
+            if (confirm('今週のデータを全てリセットしますか？この操作は取り消せません。')) {
+                const weekKey = currentWeekStart.toISOString().split('T')[0];
+                delete gameData.weeks[weekKey];
+                saveData();
+                
+                renderDistinctions();
+                renderBingoGrid();
+                updateStats();
+                
+                alert('今週のデータをリセットしました。');
+            }
+        }
+
+        // モーダルを閉じる
+        function closeModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        // 自動保存機能（定期的にバックアップ）
+        function autoBackup() {
+            try {
+                // 週のデータが存在する場合のみバックアップ
+                if (Object.keys(gameData.weeks).length > 0 || gameData.history.length > 0) {
+                    saveData();
+                    console.log('Auto backup completed');
+                }
+            } catch (e) {
+                console.warn('Auto backup failed:', e);
+            }
+        }
+
+        // データ整合性チェック
+        function validateData(data) {
+            if (!data || typeof data !== 'object') return false;
+            if (!data.weeks || typeof data.weeks !== 'object') return false;
+            if (!Array.isArray(data.history)) return false;
+            
+            // 各週のデータ構造をチェック
+            for (const weekKey in data.weeks) {
+                const week = data.weeks[weekKey];
+                if (!Array.isArray(week.selected)) return false;
+                if (!week.progress || typeof week.progress !== 'object') return false;
+            }
+            
+            return true;
+        }
+            console.log('ヒボンゲーム初期化開始');
+            
+            // イベントリスナー設定
+            document.getElementById('prevWeek').addEventListener('click', () => changeWeek(-1));
+            document.getElementById('nextWeek').addEventListener('click', () => changeWeek(1));
+            
+            // モーダル外クリックで閉じる
+            document.getElementById('historyModal').addEventListener('click', (e) => {
+                if (e.target.id === 'historyModal') {
+                    closeModal();
+                }
+            });
+            
+            // 初期描画
+            renderDistinctions();
+            renderBingoGrid();
+            updateWeekDisplay();
+            updateStats();
+            
+            console.log('ヒボンゲーム初期化完了');
+        }
+
+        // ページ読み込み完了時に初期化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
