@@ -207,17 +207,6 @@
             line-height: 1.4;
         }
 
-        .selected-distinctions {
-            margin-top: 30px;
-        }
-
-        .selected-title {
-            color: #d63031;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
         .bingo-section {
             margin: 30px 0;
         }
@@ -599,7 +588,6 @@
         // データの読み込み（localStorage対応）
         function loadData() {
             try {
-                // まずlocalStorageから読み込みを試行
                 const savedData = localStorage.getItem('hibonGameData');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
@@ -607,7 +595,6 @@
                     return parsed;
                 }
                 
-                // localStorageにデータがない場合は初期データ
                 console.log('No saved data found, creating new data');
                 return {
                     weeks: {},
@@ -616,7 +603,6 @@
             } catch (e) {
                 console.warn('localStorage not available, using memory storage:', e);
                 
-                // localStorageが使えない場合はメモリ内保存にフォールバック
                 if (!window.hibonGameData) {
                     window.hibonGameData = {
                         weeks: {},
@@ -630,78 +616,13 @@
         // データの保存（localStorage対応）
         function saveData() {
             try {
-                // localStorageに保存を試行
                 localStorage.setItem('hibonGameData', JSON.stringify(gameData));
                 console.log('Data saved to localStorage');
             } catch (e) {
                 console.warn('localStorage save failed, using memory storage:', e);
-                
-                // localStorageが使えない場合はメモリ内保存
                 window.hibonGameData = gameData;
                 console.log('Data saved to memory');
             }
-        }
-
-        // データのバックアップ機能
-        function backupData() {
-            try {
-                const dataStr = JSON.stringify(gameData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `hibon_backup_${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                
-                URL.revokeObjectURL(url);
-                alert('データをバックアップしました！');
-            } catch (e) {
-                console.error('Backup failed:', e);
-                alert('バックアップに失敗しました。');
-            }
-        }
-
-        // データの復元機能
-        function restoreData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        
-                        // データの妥当性チェック
-                        if (importedData.weeks && importedData.history) {
-                            if (confirm('データを復元しますか？現在のデータは上書きされます。')) {
-                                gameData = importedData;
-                                saveData();
-                                
-                                // 画面を更新
-                                renderDistinctions();
-                                renderBingoGrid();
-                                updateStats();
-                                
-                                alert('データを復元しました！');
-                            }
-                        } else {
-                            alert('無効なファイル形式です。');
-                        }
-                    } catch (e) {
-                        console.error('Restore failed:', e);
-                        alert('ファイルの読み込みに失敗しました。');
-                    }
-                };
-                reader.readAsText(file);
-            };
-            
-            input.click();
         }
 
         // 週データの取得
@@ -820,14 +741,11 @@
             const weekData = getWeekData();
             const progress = weekData.progress[distId];
             
-            // 最後に完了したセルまでクリック可能
             const lastCompletedIndex = progress.lastIndexOf(true);
             
             if (lastCompletedIndex === -1) {
-                // まだ何も完了していない場合、最初のセルのみクリック可能
                 return index === 0;
             } else {
-                // 最後に完了したセルと、その次のセルをクリック可能
                 return index <= lastCompletedIndex + 1;
             }
         }
@@ -842,10 +760,8 @@
             const isCompleted = progress[index];
             
             if (!isCompleted) {
-                // 完了にする（左から順番に）
                 progress[index] = true;
             } else {
-                // 解除する（右端から順番に）
                 const lastCompletedIndex = progress.lastIndexOf(true);
                 if (index === lastCompletedIndex) {
                     progress[index] = false;
@@ -864,7 +780,6 @@
             
             if (index === -1) {
                 weekData.selected.push(distId);
-                // 新しい区別の進捗配列を初期化
                 weekData.progress[distId] = new Array(10).fill(false);
             } else {
                 weekData.selected.splice(index, 1);
@@ -888,10 +803,9 @@
                     const completed = weekData.progress[distId].filter(Boolean).length;
                     totalCount += completed;
                     
-                    // 段階到達数の計算
-                    if (completed >= 10) stageCount += 3; // ブレイクスルー到達
-                    else if (completed >= 6) stageCount += 2; // はずみ期到達
-                    else if (completed >= 3) stageCount += 1; // 集中期到達
+                    if (completed >= 10) stageCount += 3;
+                    else if (completed >= 6) stageCount += 2;
+                    else if (completed >= 3) stageCount += 1;
                 }
             });
             
@@ -910,7 +824,6 @@
             
             document.getElementById('currentWeek').textContent = `${startStr}〜${endStr}`;
             
-            // ボタンの状態
             const prevWeek = new Date(currentWeekStart);
             prevWeek.setDate(currentWeekStart.getDate() - 7);
             document.getElementById('prevWeek').disabled = prevWeek < GAME_START;
@@ -932,6 +845,66 @@
                 updateWeekDisplay();
                 updateStats();
             }
+        }
+
+        // バックアップ機能
+        function backupData() {
+            try {
+                const dataStr = JSON.stringify(gameData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `hibon_backup_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                alert('データをバックアップしました！');
+            } catch (e) {
+                console.error('Backup failed:', e);
+                alert('バックアップに失敗しました。');
+            }
+        }
+
+        // 復元機能
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.weeks && importedData.history) {
+                            if (confirm('データを復元しますか？現在のデータは上書きされます。')) {
+                                gameData = importedData;
+                                saveData();
+                                
+                                renderDistinctions();
+                                renderBingoGrid();
+                                updateStats();
+                                
+                                alert('データを復元しました！');
+                            }
+                        } else {
+                            alert('無効なファイル形式です。');
+                        }
+                    } catch (e) {
+                        console.error('Restore failed:', e);
+                        alert('ファイルの読み込みに失敗しました。');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
         }
 
         // 今週完了
@@ -996,12 +969,12 @@
             document.getElementById('historyModal').style.display = 'block';
         }
 
-        // データエクスポート（バックアップ機能に変更）
+        // データエクスポート
         function exportData() {
             backupData();
         }
 
-        // データインポート機能を追加
+        // データインポート
         function importData() {
             restoreData();
         }
@@ -1026,10 +999,9 @@
             document.getElementById('historyModal').style.display = 'none';
         }
 
-        // 自動保存機能（定期的にバックアップ）
+        // 自動保存機能
         function autoBackup() {
             try {
-                // 週のデータが存在する場合のみバックアップ
                 if (Object.keys(gameData.weeks).length > 0 || gameData.history.length > 0) {
                     saveData();
                     console.log('Auto backup completed');
@@ -1045,7 +1017,6 @@
             if (!data.weeks || typeof data.weeks !== 'object') return false;
             if (!Array.isArray(data.history)) return false;
             
-            // 各週のデータ構造をチェック
             for (const weekKey in data.weeks) {
                 const week = data.weeks[weekKey];
                 if (!Array.isArray(week.selected)) return false;
@@ -1054,20 +1025,35 @@
             
             return true;
         }
+
+        // 初期化
+        function init() {
             console.log('ヒボンゲーム初期化開始');
             
-            // イベントリスナー設定
+            if (!validateData(gameData)) {
+                console.warn('Invalid data detected, resetting to default');
+                gameData = {
+                    weeks: {},
+                    history: []
+                };
+                saveData();
+            }
+            
+            setInterval(autoBackup, 5 * 60 * 1000);
+            
             document.getElementById('prevWeek').addEventListener('click', () => changeWeek(-1));
             document.getElementById('nextWeek').addEventListener('click', () => changeWeek(1));
             
-            // モーダル外クリックで閉じる
+            window.addEventListener('beforeunload', () => {
+                saveData();
+            });
+            
             document.getElementById('historyModal').addEventListener('click', (e) => {
                 if (e.target.id === 'historyModal') {
                     closeModal();
                 }
             });
             
-            // 初期描画
             renderDistinctions();
             renderBingoGrid();
             updateWeekDisplay();
